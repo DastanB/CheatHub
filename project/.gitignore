@@ -1,2 +1,4 @@
 .idea/
 myenv/
+db.sqlite3
+main.log
