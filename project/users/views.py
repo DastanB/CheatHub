@@ -47,6 +47,8 @@ class UserViewSet(mixins.ListModelMixin,
             activation = Activation.objects.get(id=id)
         except Activation.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
+        if not activation.is_active:
+            return Response({"Success": 'User is already activated'}, status.HTTP_200_OK)
         if activation.user:
             activation.is_active = False
             user = activation.user
