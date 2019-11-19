@@ -3,10 +3,12 @@ from rest_framework.response import Response
 from rest_framework import viewsets, mixins
 from rest_framework import status
 from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated
 from requests import Request
 
-from users.serializers import UserSerializer
-from users.models import MainUser, Activation
+from users.serializers import UserSerializer, UniversitySerializer
+from users.models import MainUser, Activation, University
+from users.permissions import UniPermission
 
 import constants
 
@@ -57,3 +59,8 @@ class UserViewSet(mixins.ListModelMixin,
             user.save()
             return Response({"Success": "Your account is now activeted!"}, status=status.HTTP_200_OK)
         return Response({"Error": 'User not found'}, status.HTTP_404_NOT_FOUND)
+
+class UniViewset(viewsets.ModelViewSet):
+    queryset = University.objects.all()
+    serializer_class = UniversitySerializer
+    permission_classes = (UniPermission,)

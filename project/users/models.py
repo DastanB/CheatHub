@@ -1,7 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
-from utils.upload import avatar_path
-from utils.validators import validate_extension, validate_file_size
+from utils import *
 
 
 class University(models.Model):

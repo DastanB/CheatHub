@@ -1,0 +1,17 @@
+ORDER_ESSAY = 1
+ORDER_MATH = 2
+ORDER_IT_PROJECT = 3
+
+ORDER_TYPES = (
+    (ORDER_ESSAY, 'Essay'),
+    (ORDER_MATH, 'Math problems'),
+    (ORDER_IT_PROJECT, 'IT project')
+)
+
+PAYMENT_VIA_CARD = 1
+PAYMENT_VIA_CASH = 2
+
+PAYMENT_TYPES = (
+    (PAYMENT_VIA_CARD, 'By card'),
+    (PAYMENT_VIA_CASH, 'By cash')
+)
