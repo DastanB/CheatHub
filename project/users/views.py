@@ -3,10 +3,12 @@ from rest_framework.response import Response
 from rest_framework import viewsets, mixins
 from rest_framework import status
 from rest_framework.decorators import action
+from rest_framework.parsers import FormParser, MultiPartParser, JSONParser
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from requests import Request
 
-from users.serializers import UserSerializer
-from users.models import MainUser, Activation
+from users.serializers import UserFullSerializer, ProfileFullSerializer, UniversityFullSerializer
+from users.models import MainUser, Activation, Profile, University
 
 import constants
 
@@ -14,12 +16,15 @@ import constants
 class UserViewSet(mixins.ListModelMixin,
                   viewsets.GenericViewSet):
     queryset = MainUser.objects.all()
-    serializer_class = UserSerializer
+    serializer_class = UserFullSerializer
     http_method_names = ['get', 'post']
+
+    def get_permissions(self):
+        pass
 
     @action(detail=False, methods=['post'])
     def register(self, request, pk=None):
-        serializer = UserSerializer(data=request.data)
+        serializer = UserFullSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
             activation = Activation.objects.create(user=user)
@@ -57,3 +62,33 @@ class UserViewSet(mixins.ListModelMixin,
             user.save()
             return Response({"Success": "Your account is now activeted!"}, status=status.HTTP_200_OK)
         return Response({"Error": 'User not found'}, status.HTTP_404_NOT_FOUND)
+
+
+class ProfileViewSet(mixins.UpdateModelMixin,
+                     viewsets.GenericViewSet):
+    queryset = Profile.objects.all()
+    serializer_class = ProfileFullSerializer
+    http_method_names = ['put', 'patch']
+    parser_classes = (FormParser, MultiPartParser, JSONParser)
+    permission_classes = (IsAuthenticated, )
+
+    @action(detail=False, methods=['put', 'patch'])
+    def edit_profile(self, request, pk=None):
+        profile = request.user.profile
+        if request.POST.get('bio'):
+            profile.bio = request.POST.get('bio')
+        if request.POST.get('avatar'):
+            profile.avatar = request.POST.get('avatar')
+        if request.POST.get('university'):
+            try:
+                university = University.objects.get(request.POST.get('university'))
+            except University.DoesNotExist:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+            profile.university = university
+        profile.save()
+
+
+class UniversityViewSet(viewsets.ModelViewSet):
+    queryset = University.objects.all()
+    serializer_class = UniversityFullSerializer
+    permission_classes = (IsAdminUser,)
