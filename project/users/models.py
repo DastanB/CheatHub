@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
-from utils import *
+import utils
 
 
 class University(models.Model):
