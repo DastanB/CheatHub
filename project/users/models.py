@@ -58,9 +58,10 @@ class MainUser(AbstractUser):
 
 
 class Profile(models.Model):
-    user = models.OneToOneField(MainUser, on_delete=models.CASCADE)
+    user = models.OneToOneField(MainUser, on_delete=models.CASCADE, related_name='profile')
     bio = models.TextField(max_length=500)
-    avatar = models.FileField(upload_to=avatar_path, validators=[validate_file_size, validate_extension])
+    avatar = models.FileField(upload_to=avatar_path, validators=[validate_file_size, validate_extension],
+                              null=True, blank=True)
     university = models.ForeignKey(University, on_delete=models.CASCADE, null=True)
 
     def __str__(self):
