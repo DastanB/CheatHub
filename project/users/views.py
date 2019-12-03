@@ -63,7 +63,7 @@ class UserViewSet(mixins.ListModelMixin,
             return Response({"Success": "Your account is now activeted!"}, status=status.HTTP_200_OK)
         return Response({"Error": 'User not found'}, status.HTTP_404_NOT_FOUND)
 
-
+      
 class ProfileViewSet(mixins.UpdateModelMixin,
                      viewsets.GenericViewSet):
     queryset = Profile.objects.all()
@@ -92,3 +92,8 @@ class UniversityViewSet(viewsets.ModelViewSet):
     queryset = University.objects.all()
     serializer_class = UniversityFullSerializer
     permission_classes = (IsAdminUser,)
+    
+# class UniViewset(viewsets.ModelViewSet):
+#     queryset = University.objects.all()
+#     serializer_class = UniversitySerializer
+#     permission_classes = (UniPermission,)

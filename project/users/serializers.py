@@ -13,7 +13,7 @@ class UserFullSerializer(serializers.ModelSerializer):
         user = MainUser.objects.create_user(**validated_data)
         return user
 
-
+      
 class UniversityFullSerializer(serializers.ModelSerializer):
     class Meta:
         model = University
@@ -27,4 +27,3 @@ class ProfileFullSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
         fields = '__all__'
-
