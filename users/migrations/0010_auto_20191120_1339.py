@@ -15,6 +15,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='profile',
             name='avatar',
-            field=models.FileField(blank=True, null=True, upload_to=utils.upload.avatar_path, validators=[utils.validators.validate_file_size, utils.validators.validate_extension]),
+            field=models.FileField(blank=True, null=True, upload_to='', validators=[utils.validators.validate_file_size, utils.validators.validate_extension]),
         ),
     ]

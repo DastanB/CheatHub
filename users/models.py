@@ -1,5 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
+from utils.upload import user_avatar_path
+from utils.validators import validate_file_size, validate_extension
+
 import utils
 
 
@@ -60,7 +63,7 @@ class MainUser(AbstractUser):
 class Profile(models.Model):
     user = models.OneToOneField(MainUser, on_delete=models.CASCADE, related_name='profile')
     bio = models.TextField(max_length=500)
-    avatar = models.FileField(upload_to=avatar_path, validators=[validate_file_size, validate_extension],
+    avatar = models.FileField(upload_to=user_avatar_path, validators=[validate_file_size, validate_extension],
                               null=True, blank=True)
     university = models.ForeignKey(University, on_delete=models.CASCADE, null=True)
 

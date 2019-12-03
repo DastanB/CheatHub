@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from main.models import Order, OrderPicture, CommentOrder, Review, CommentReview
-from users.serializers import UserSerializer
+from users.serializers import UserFullSerializer
+
+
 class OrderShortSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
@@ -18,21 +20,21 @@ class OrderPictureSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class CommentOrderSerializer(serializers.ModelSerializer):
-    user = UserSerializer(read_only=True)
-    reciever = UserSerializer()
+    user = UserFullSerializer(read_only=True)
+    reciever = UserFullSerializer()
     class Meta:
         model = CommentOrder
         fields = '__all__'
 
 class ReviewSerializer(serializers.ModelSerializer):
-    user = UserSerializer(read_only=True)
-    reciever = UserSerializer()
+    user = UserFullSerializer(read_only=True)
+    reciever = UserFullSerializer()
     class Meta:
         model = Review
         fields = '__all__'
 
 class CommentReviewSerializer(serializers.ModelSerializer):
-    user = UserSerializer(read_only=True)
+    user = UserFullSerializer(read_only=True)
     class Meta:
         model = CommentReview
         fields = '__all__'
