@@ -9,7 +9,7 @@ from utils.upload import user_avatar_delete_path
 def user_created(sender, instance, created=True, **kwargs):
     if instance.first_name and instance.last_name and instance.full_name == '':
         instance.full_name = f'{instance.first_name} {instance.last_name}'
-    if not instance.profile:
+    if not  Profile.objects.filter(user=instance).first():
         Profile.objects.create(user=instance)
 
 

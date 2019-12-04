@@ -62,7 +62,7 @@ class UserViewSet(viewsets.GenericViewSet):
             user.is_active = True
             activation.save()
             user.save()
-            logger.info(f'User with email {serializer.data.get("email")} activated')
+            logger.info(f'User with email {activation.user.email} activated')
             return Response({"Success": "Your account is now activeted!"}, status=status.HTTP_200_OK)
         logger.error(f'Activation with email {serializer.data.get("email")} failed \n'
                      f'{serializer.errors}')

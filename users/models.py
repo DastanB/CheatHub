@@ -82,4 +82,4 @@ class Activation(models.Model):
     user = models.OneToOneField(MainUser, on_delete=models.CASCADE, related_name='activation')
     is_active = models.BooleanField(default=True)
 
-    object = ActivationManager()
+    objects = ActivationManager()
