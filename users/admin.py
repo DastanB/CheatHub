@@ -12,7 +12,14 @@ class InlineProfile(admin.StackedInline):
 
 @admin.register(MainUser)
 class MainUserAdmin(UserAdmin):
-    list_display = ('email', 'first_name', 'last_name', 'username', 'is_staff')
+    fieldsets = (
+        (None, {'fields': ('username', 'password')}),
+        (('Personal info'), {'fields': ('first_name', 'last_name', 'full_name', 'email')}),
+        (('Permissions'), {'fields': ('is_active', 'is_staff', 'is_superuser',
+                                       'groups', 'user_permissions')}),
+        (('Important dates'), {'fields': ('last_login', 'date_joined')}),
+    )
+    list_display = ('email', 'first_name', 'last_name', 'full_name', 'username', 'is_staff')
     inlines = [InlineProfile,]
 
 
