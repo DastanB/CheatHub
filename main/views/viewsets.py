@@ -39,10 +39,7 @@ class OrderViewset(viewsets.ModelViewSet):
     def comments(self, request, pk):
         if request.method == 'GET':
             order = get_object_or_404(Order, id=pk)
-            try:
-                comments = CommentOrder.objects.filter(order_id=order.id)
-            except CommentOrder.DoesNotExist:
-                return Response(status=status.HTTP_404_NOT_FOUND)
+            comments = CommentOrder.objects.filter(order_id=order.id)
             serializer = CommentOrderShortSerializer(comments, many=True)
 
             return Response(serializer.data)
@@ -60,10 +57,7 @@ class OrderViewset(viewsets.ModelViewSet):
     def pictures(self, request, pk):
         if request.method == 'GET':
             order = get_object_or_404(Order, id=pk)
-            try:
-                pictures = OrderPicture.objects.filter(order_id=order.id)
-            except OrderPicture.DoesNotExist:
-                return Response(status=status.HTTP_404_NOT_FOUND)
+            pictures = OrderPicture.objects.filter(order_id=order.id)
             serializer = OrderPictureShortSerializer(pictures,
                                                    many=True,
                                                    context={'request': request})
@@ -115,16 +109,14 @@ class ReviewViewset(viewsets.ModelViewSet):
         logger.info(f"{self.request.user} created review:")
         return serializer.data
     
-    @action(methods=['GET', 'POST'], detail=True, permission_classes=[CommentsInReviewPermission])
+    @action(methods=['GET', 'POST'], detail=True, permission_classes=[IsAuthenticated,])
     def comments(self, request, pk):
-        if request.method is 'GET':
+        
+        if request.method == 'GET':
             review = get_object_or_404(Review, id=pk)
-            try:
-                comments = CommentReview.objects.filter(review_id=review.id)
-            except CommentReview.DoesNotExist:
-                return Response(status=status.HTTP_404_NOT_FOUND)
+            comments = CommentReview.objects.filter(review_id=review.id)
             serializer = CommentReviewShortSerializer(comments, many=True)
-
+            
             return Response(serializer.data)
         
         if request.method == 'POST':
