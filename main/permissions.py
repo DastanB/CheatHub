@@ -93,3 +93,4 @@ class CommentReviewPermission(BasePermission):
     def has_object_permission(self, request, view, obj):
         if view.action != 'retrieve':
             return request.user == obj.user or request.user == obj.user
+        return True
