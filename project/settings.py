@@ -185,13 +185,13 @@ LOGGING = {
     },
     'handlers': {
         'main_file': {
-            'level': 'ERROR',
+            'level': 'INFO',
             'class': 'logging.FileHandler',
-            'filename': 'main.log',
+            'filename': os.path.join(BASE_DIR, 'logs') + '/main/main.log',
             'formatter': 'verbose'
         },
         'users_handler': {
-            'level': 'DEBUG',
+            'level': 'INFO',
             'class': 'logging.handlers.RotatingFileHandler',
             'filename': os.path.join(BASE_DIR, 'logs') + '/users/users.log',
             'formatter': 'verbose'

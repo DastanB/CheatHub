@@ -47,22 +47,34 @@ class Order(models.Model):
     def __str__(self):
         return self.title
 
+class OrderPictureManager(models.Manager):
+    def get_pics_of_order(self, order):
+        return self.filter(order=order)
 
+ 
 class OrderPicture(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='pictures')
     file = models.FileField(upload_to=order_document_path, validators=[validate_file_size, validate_extension],
                                 null=True, blank=True)
-    
+    objects = OrderPictureManager()
+
     def __str__(self):
         return self.order.title
 
-
-class CommentOrder(models.Model):
-    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='comments')
+class Comment(models.Model):
     message = models.CharField(max_length=10000000)
     created_at = models.DateTimeField(default=datetime.now)
     user = models.ForeignKey(MainUser, on_delete=models.CASCADE, related_name='my_comments')
+
+class CommentOrderManager(models.Manager):
+    def get_comments_of_order(self, order):
+        return self.filter(order=order)
+
+class CommentOrder(Comment):
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='comments')
     reciever = models.ForeignKey(MainUser, on_delete=models.CASCADE, related_name='comments_to_me', null=True)
+
+    objects = CommentOrderManager()
 
     def __str__(self):
         return self.order.title
@@ -95,11 +107,8 @@ class Review(models.Model):
         return self.reciever.username
 
 
-class CommentReview(models.Model):
+class CommentReview(Comment):
     review = models.OneToOneField(Review, on_delete=models.CASCADE)
-    message = models.CharField(max_length=10000000)
-    created_at = models.DateTimeField(default=datetime.now)
-    user = models.ForeignKey(MainUser, on_delete=models.CASCADE, related_name='my_comment_to_reviews')
 
     def __str__(self):
         return self.review.reciever.username

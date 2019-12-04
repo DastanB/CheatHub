@@ -1,8 +1,13 @@
+import logging
+
 from rest_framework import viewsets, status, mixins
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.parsers import FormParser, MultiPartParser, JSONParser
+from rest_framework_jwt.authentication import JSONWebTokenAuthentication
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.views import APIView
 
 from django.shortcuts import get_object_or_404
 
@@ -13,6 +18,7 @@ from main.serializers import OrderShortSerializer, OrderFullSerializer, OrderPic
 from main.permissions import OrderPermission, CommentOrderPermission, CommentReviewPermission, ReviewPermission, \
     PictureOrderPermission, CommentInOrderPermission, PicturesInOrderPermission, CommentsInReviewPermission
 
+logger = logging.getLogger(__name__)
 
 class OrderViewset(viewsets.ModelViewSet):
     queryset = Order.objects.all()
@@ -26,6 +32,7 @@ class OrderViewset(viewsets.ModelViewSet):
     
     def perform_create(self, serializer):
         serializer.save(customer=self.request.user)
+        logger.info(f"{self.request.user} created order: {serializer.data.get('title')}")
         return serializer.data
     
     @action(methods=['GET', 'POST'], detail=True, permission_classes=[CommentInOrderPermission])
@@ -45,6 +52,7 @@ class OrderViewset(viewsets.ModelViewSet):
             serializer = CommentOrderFullSerializer(data=request.data)
             if serializer.is_valid():
                 serializer.save(user=self.request.user, reciever=instance.customer, order=instance)
+                logger.info(f"{self.request.user} created comment: {serializer.data.get('message')}")
                 return Response(serializer.data)
             return Response(serializer.errors)
     
@@ -66,6 +74,7 @@ class OrderViewset(viewsets.ModelViewSet):
             serializer = OrderPictureSerializer(data=request.data)
             if serializer.is_valid():
                 serializer.save(order=instance)
+                logger.info(f"{self.request.user} added comment to order")
                 return Response(serializer.data)
             return Response(serializer.errors)
 
@@ -103,6 +112,7 @@ class ReviewViewset(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+        logger.info(f"{self.request.user} created review:")
         return serializer.data
     
     @action(methods=['GET', 'POST'], detail=True, permission_classes=[CommentsInReviewPermission])
@@ -122,6 +132,7 @@ class ReviewViewset(viewsets.ModelViewSet):
             serializer = CommentOrderFullSerializer(data=request.data)
             if serializer.is_valid():
                 serializer.save(user=self.request.user, review=instance)
+                logger.info(f"{self.request.user} added comment to review")
                 return Response(serializer.data)
             return Response(serializer.errors)
 
