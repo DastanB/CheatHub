@@ -69,7 +69,7 @@ class ReviewPermission(BasePermission):
         return True
 
     def has_object_permission(self, request, view, obj):
-        if view.action in ['update', 'destroy']:
+        if view.action in ['update', 'partial_update', 'destroy']:
             return request.user == obj.order.executor or request.user == obj.order.customer
 
 
@@ -80,6 +80,7 @@ class CommentsInReviewPermission(BasePermission):
         if request.method == 'POST':
             return request.user.is_authenticated
         return True
+
 
 class CommentReviewPermission(BasePermission):
     message = 'You must be logged in or the owner of the comment to update/delete.'
