@@ -64,7 +64,10 @@ class OrderPicture(models.Model):
 class Comment(models.Model):
     message = models.CharField(max_length=10000000)
     created_at = models.DateTimeField(default=datetime.now)
-    user = models.ForeignKey(MainUser, on_delete=models.CASCADE, related_name='my_comments')
+    user = models.ForeignKey(MainUser, on_delete=models.CASCADE)
+
+    class Meta:
+        abstract = True
 
 class CommentOrderManager(models.Manager):
     def get_comments_of_order(self, order):
