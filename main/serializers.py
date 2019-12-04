@@ -56,6 +56,11 @@ class OrderFullSerializer(OrderShortSerializer):
             raise serializers.ValidationError(f'Order type options: {ORDER_TYPES}')
         return value
 
+    def validate_id(self, value):
+        if not isinstance(value, int) and value < 1:
+            raise serializers.ValidationError(f'Id must me integer and greater or equal to 1')
+        return value
+
 
 class OrderPictureShortSerializer(serializers.Serializer):
     order_title = serializers.SerializerMethodField(read_only=True)
@@ -77,6 +82,11 @@ class OrderPictureSerializer(serializers.Serializer):
         picture = OrderPicture(**validated_data)
         picture.save()
         return picture
+
+    def validate_id(self, value):
+        if not isinstance(value, int) and value < 1:
+            raise serializers.ValidationError(f'Id must me integer and greater or equal to 1')
+        return value
 
 
 class CommentOrderShortSerializer(serializers.ModelSerializer):
@@ -101,6 +111,11 @@ class CommentOrderFullSerializer(CommentOrderShortSerializer):
 
     class Meta(CommentOrderShortSerializer.Meta):
         fields = CommentOrderShortSerializer.Meta.fields + ('order', 'created_at', 'user', 'reciever')
+
+    def validate_id(self, value):
+        if not isinstance(value, int) and value < 1:
+            raise serializers.ValidationError(f'Id must me integer and greater or equal to 1')
+        return value
 
 
 class ReviewShortSerializer(serializers.ModelSerializer):
@@ -130,6 +145,11 @@ class ReviewFullSerializer(ReviewShortSerializer):
             serializers.ValidationError(f'Rating scale is from 1 to 5')
         return value
 
+    def validate_id(self, value):
+        if not isinstance(value, int) and value < 1:
+            raise serializers.ValidationError(f'Id must me integer and greater or equal to 1')
+        return value
+
 
 class CommentReviewShortSerializer(serializers.ModelSerializer):
     reciever_name = serializers.SerializerMethodField(read_only=True)
@@ -154,3 +174,8 @@ class CommentReviewFullSerializer(CommentReviewShortSerializer):
         review_data = validated_data.get('review')
         Review.objects.create(**review_data)
         CommentReview.objects.create(**validated_data)
+
+    def validate_id(self, value):
+        if not isinstance(value, int) and value < 1:
+            raise serializers.ValidationError(f'Id must me integer and greater or equal to 1')
+        return value
