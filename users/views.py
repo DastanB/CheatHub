@@ -7,20 +7,19 @@ from rest_framework.parsers import FormParser, MultiPartParser, JSONParser
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from requests import Request
 
-from users.serializers import UserFullSerializer, ProfileFullSerializer, UniversityFullSerializer
+from users.serializers import UserFullSerializer, ProfileShortSerializer, ProfileFullReadSerializer, \
+    ProfileFullWriteSerializer, UniversityFullSerializer
 from users.models import MainUser, Activation, Profile, University
 
 import constants
+import logging
+
+logger = logging.getLogger(__name__)
 
 
-class UserViewSet(mixins.ListModelMixin,
-                  viewsets.GenericViewSet):
+class UserViewSet(viewsets.GenericViewSet):
     queryset = MainUser.objects.all()
-    serializer_class = UserFullSerializer
     http_method_names = ['get', 'post']
-
-    def get_permissions(self):
-        pass
 
     @action(detail=False, methods=['post'])
     def register(self, request, pk=None):
@@ -42,7 +41,10 @@ class UserViewSet(mixins.ListModelMixin,
                 recipient_list = [serializer.data.get('email'), ],
                 fail_silently = False,
             )
+            logger.info(f'User with email {serializer.data.get("email")} registered')
             return Response(serializer.data)
+        logger.error(f'Registration with email {serializer.data.get("email")} failed \n'
+                     f'{serializer.errors}')
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=False, methods=['get'])
@@ -60,40 +62,47 @@ class UserViewSet(mixins.ListModelMixin,
             user.is_active = True
             activation.save()
             user.save()
+            logger.info(f'User with email {serializer.data.get("email")} activated')
             return Response({"Success": "Your account is now activeted!"}, status=status.HTTP_200_OK)
+        logger.error(f'Activation with email {serializer.data.get("email")} failed \n'
+                     f'{serializer.errors}')
         return Response({"Error": 'User not found'}, status.HTTP_404_NOT_FOUND)
 
       
-class ProfileViewSet(mixins.UpdateModelMixin,
-                     viewsets.GenericViewSet):
+class ProfileViewSet(viewsets.GenericViewSet):
     queryset = Profile.objects.all()
-    serializer_class = ProfileFullSerializer
-    http_method_names = ['put', 'patch']
+    http_method_names = ['get', 'put', 'patch']
     parser_classes = (FormParser, MultiPartParser, JSONParser)
     permission_classes = (IsAuthenticated, )
 
+    @action(detail=False, methods=['get'])
+    def get_profile(self, request):
+        try:
+            profile = Profile.objects.get(user=request.user)
+        except Profile.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        serializer = ProfileShortSerializer(profile,
+                                           context={'request': request})
+        logger.info(f'Get of profile id: {profile.id}')
+        return Response(serializer.data)
+
     @action(detail=False, methods=['put', 'patch'])
     def edit_profile(self, request, pk=None):
-        profile = request.user.profile
-        if request.POST.get('bio'):
-            profile.bio = request.POST.get('bio')
-        if request.POST.get('avatar'):
-            profile.avatar = request.POST.get('avatar')
-        if request.POST.get('university'):
-            try:
-                university = University.objects.get(request.POST.get('university'))
-            except University.DoesNotExist:
-                return Response(status=status.HTTP_404_NOT_FOUND)
-            profile.university = university
-        profile.save()
+        try:
+            profile = Profile.objects.get(id=request.user.profile.id)
+        except Profile.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        serializer = ProfileFullWriteSerializer(instance=profile, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            logger.info(f'Profile with id: {profile.id} updated')
+            return Response(serializer.data)
+        logger.error(f'Update of profile id: {profile.id} failed \n'
+                     f'{serializer.errors}')
+        return Response(serializer.errors)
 
 
 class UniversityViewSet(viewsets.ModelViewSet):
     queryset = University.objects.all()
     serializer_class = UniversityFullSerializer
     permission_classes = (IsAdminUser,)
-    
-# class UniViewset(viewsets.ModelViewSet):
-#     queryset = University.objects.all()
-#     serializer_class = UniversitySerializer
-#     permission_classes = (UniPermission,)

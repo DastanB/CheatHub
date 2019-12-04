@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
-import utils
+from utils.upload import user_avatar_path
+from utils.validators import validate_file_size, validate_extension
 
 
 class University(models.Model):
@@ -39,6 +40,7 @@ class MainUser(AbstractUser):
     email = models.EmailField(unique=True)
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=150)
+    full_name = models.CharField(max_length=181, blank=True)
     is_customer = models.BooleanField(default=False)
     is_executor = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
@@ -60,14 +62,24 @@ class MainUser(AbstractUser):
 class Profile(models.Model):
     user = models.OneToOneField(MainUser, on_delete=models.CASCADE, related_name='profile')
     bio = models.TextField(max_length=500)
-    avatar = models.FileField(upload_to=avatar_path, validators=[validate_file_size, validate_extension],
+    avatar = models.FileField(upload_to=user_avatar_path, validators=[validate_file_size, validate_extension],
                               null=True, blank=True)
-    university = models.ForeignKey(University, on_delete=models.CASCADE, null=True)
+    university = models.ForeignKey(University, on_delete=models.SET(None), null=True)
 
     def __str__(self):
         return self.user.username
 
 
+class ActivationManager(models.Manager):
+    def active(self):
+        return self.filter(is_active=True)
+
+    def inactive(self):
+        return self.filter(is_active=False)
+
+
 class Activation(models.Model):
     user = models.OneToOneField(MainUser, on_delete=models.CASCADE, related_name='activation')
     is_active = models.BooleanField(default=True)
+
+    object = ActivationManager()

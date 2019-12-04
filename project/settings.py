@@ -160,7 +160,7 @@ JWT_AUTH = {
     'JWT_VERIFY': True,
     'JWT_VERIFY_EXPIRATION': True,
     'JWT_LEEWAY': 0,
-    'JWT_EXPIRATION_DELTA': datetime.timedelta(minutes=10),
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(minutes=1000),
     'JWT_AUDIENCE': None,
     'JWT_ISSUER': None,
 
@@ -190,6 +190,12 @@ LOGGING = {
             'filename': 'main.log',
             'formatter': 'verbose'
         },
+        'users_handler': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': os.path.join(BASE_DIR, 'logs') + '/users/users.log',
+            'formatter': 'verbose'
+        },
         'console_handler': {
             'level': 'INFO',
             'class': 'logging.StreamHandler',
@@ -202,6 +208,11 @@ LOGGING = {
             'level': 'DEBUG',
             'propogate': True,
         },
+        'users': {
+            'handlers': ['users_handler', 'console_handler'],
+            'level': 'DEBUG',
+            'propogate': True
+        }
     },
 }
 
